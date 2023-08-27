@@ -35,11 +35,11 @@ async function main() {
 
             let codigoMarca;
             while (true) {
-                const codigoMarca = await getUserInput('Digite o código da marca (ou "voltar" para retornar): ');
+                codigoMarca = await getUserInput('Digite o código da marca (ou "voltar" para retornar): ');
 
                 if (codigoMarca.toLowerCase() === 'voltar'){
                     console.log('Retornando ao início...');
-                    continue;
+                    break;
                 } else if (isValidCode(marcas, codigoMarca)){
                     await getModelsByBrand(tipoVeiculo, codigoMarca);
                     break;
@@ -52,11 +52,7 @@ async function main() {
             }
 
         } catch (error) {
-            if (error.response) {    
-                console.error('Ocorreu um erro ao obter as marcas desejada.')
-            } else {
-                console.error('Ocorreu um erro desconhecido!');
-            }
+            console.error('Ocorreu um erro!')
         }
     }
     rl.close();
@@ -70,11 +66,33 @@ async function getModelsByBrand(tipoVeiculo, codigoMarca){
 
         console.log('Modelos da marca selecionada: ');
         modelos.forEach(modelo => {
-            console.log(`Nome: ${modelo.nome}`);
+            console.log(`Nome: ${modelo.nome}, Código: ${modelo.codigo}`);
         });
+
+        const codigoModelo = await getUserInput('Digite o código do modelo:')
+        await getModelsAndYears(tipoVeiculo, codigoMarca, codigoModelo);
+
     } catch (error) {
         console.error('Ocorreu um erro!');
     } 
 }
 
+async function getModelsAndYears(tipoVeiculo, codigoMarca, codigoModelo){
+    const apiUrlAnos = `https://parallelum.com.br/fipe/api/v1/${tipoVeiculo}/marcas/${codigoMarca}/modelos/${codigoModelo}/anos`
+    
+    try {
+        const responseAnos = await axios.get(apiUrlAnos);
+        const anos = responseAnos.data;
+
+        console.log('Anos disponíveis para o modelo selecionado: ')
+        anos.forEach(anos => {
+            console.log(`Código: ${anos.codigo}, Nome: ${anos.nome}`)
+        })
+
+        const codigoAno = await getUserInput('Digite o código do ano: ');
+
+    } catch (error) {
+        console.error('Ocorreu um erro ao obter os modelos ou anos')
+    }
+}
 main();
