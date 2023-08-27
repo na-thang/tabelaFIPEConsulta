@@ -90,9 +90,24 @@ async function getModelsAndYears(tipoVeiculo, codigoMarca, codigoModelo){
         })
 
         const codigoAno = await getUserInput('Digite o código do ano: ');
+        await getResult(tipoVeiculo, codigoMarca, codigoModelo, codigoAno);
 
     } catch (error) {
         console.error('Ocorreu um erro ao obter os modelos ou anos')
+    }
+}
+
+async function getResult(tipoVeiculo, codigoMarca, codigoModelo, codigoAno){
+    const apiUrlResultado = `https://parallelum.com.br/fipe/api/v1/${tipoVeiculo}/marcas/${codigoMarca}/modelos/${codigoModelo}/anos/${codigoAno}`;
+
+    try{
+        const responseResultado = await axios.get(apiUrlResultado);
+        const resultado = responseResultado.data;
+
+        console.log('Resultado para o veículo selecionado: ')
+        console.log(resultado);
+    } catch (error) {
+        console.error('Ocorreu um erro ao obter o resultado!');
     }
 }
 main();
